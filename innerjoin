@@ -1,0 +1,89 @@
+-- Agrupando dados e usando as funções de agregação;
+use workshop; 
+show tables;
+desc orderservice;
+select * from employee,service,clients;
+
+-- Verificando qual funcionario executou tal serviço e seu valor .
+-- Usando select e where para ver as condições.
+select c.pname as cliente ,e.pname funcionario , e.positionn as profissão , s.description_service as nome_do_serviço , s.valuess as valor 
+from clients as c  , employee as e , service as s
+where c.idclients = s.idservice
+and e.idemployee = s.idservice and e.idemployee = 3;
+
+-- Verificando quanto ganha um funcionario.
+select e.idemployee ,e.pname , e.salary
+from employee as e  
+where e.idemployee = 2;
+
+-- Verificando a forma de pagamento feito pelo cliente.
+select c.pname , o.statusorder, p.typepayment , p.statuspayment
+from clients as c , orderservice as o , payment as p
+where c.idclients = o.idorclients and p.idpayment =o.idorderservice;
+
+-- Recuperando dados com funções de agregação.
+select * from product;
+select sum(unit_price) as soma_dos_valores , max(unit_price) as valor_maior , 
+min(unit_price) as menor_valor , round(avg(unit_price),4) as media_do_Produto
+from product;
+
+-- Verificando a media do produto e agrupando os dados.
+select idproduct , count(*), avg(unit_price) as media_produto
+from product
+group by idproduct;
+
+-- Ordenando os dados da tabela veículo.
+select v.mark as marca_do_carro , v.model as modelo_carro, v.plate as placa_carro
+from vehicle as v
+order by v.mark desc;
+
+-- Verificando a quantidade de estoque maiores que 300.
+select s.idstocks, s.quantity
+from stocks as s
+where (s.quantity between 300 and 800);
+
+-- Verificando os valores com a função HAVING.
+select p.unit_price
+from product as p
+where p.unit_price > 50
+group by p.unit_price
+having count(*) >0;
+
+-- Aumentando o salario dos funcionarios com CASE STATEMENT.
+select * from employee ;
+update employee set salary=
+	case
+		when idemployee=1 then salary +250
+        when idemployee = 2 then salary + 100
+        when idemployee = 3 then salary + 100
+        when idemployee = 4 then salary + 200
+        when idemployee = 5 then salary + 300
+        when idemployee = 6 then salary + 400
+        when idemployee = 7 then salary + 150
+        else idemployee + 0
+	end;
+
+-- junções de tabelas
+-- Verificando quem vendeu o produto e a quantidade.
+select p.nameproduct , p.description_product ,s.socialname ,ps.quantity
+from product as p
+inner join supplier as s on p.idproduct = s.idsupplier
+inner join product_supplier as ps on s.idsupplier = ps.idpssupplier; 
+
+-- Verificando a quantide de estoque de um produto e sua localização.
+select s.idstocks , s.quantity , ps.location , p.nameproduct 
+from stocks as s
+inner join product_storage as ps on s.idstocks =ps.idpsstorage
+inner join product as p on ps.idpsstorage =p.idproduct; 
+
+-- Verificando o serviço e o valor feito no carro do cliente.
+select concat(c.pname, ' ',c.lname) as nome_cliente , v.mark as marca_do_carro ,s.description_service as descrição_serviço , s.valuess as valor_do_serviço 
+from clients as c 
+inner join vehicle as v on c.idclients = v.idvehicle 
+inner join service as s on v.idvehicle = s.idservice;
+
+-- Verificando a forma de pagamento que o cliente fez e o valor total.
+select c.pname , p.typepayment , p.totalvalue 
+from clients as c 
+inner join payment as p on c.idclients = p.idpayment; 
+
